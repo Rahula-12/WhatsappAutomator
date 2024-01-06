@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.whatsappautomator.model.AutoMessage
 
-@Database(entities=[AutoMessage::class], version = 1, exportSchema = false)
+@Database(entities=[AutoMessage::class], version = 2, exportSchema = false)
 abstract class AutoMessageDatabase: RoomDatabase() {
     abstract fun getAutoMessageDao():AutoMessageDao
 

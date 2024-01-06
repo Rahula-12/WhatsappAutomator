@@ -79,8 +79,10 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
+
     implementation("com.google.dagger:hilt-android:2.49")
     kapt("com.google.dagger:hilt-compiler:2.49")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha02")
 
     // For instrumentation tests
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.49")
@@ -89,5 +91,9 @@ dependencies {
     // For local unit tests
     testImplementation("com.google.dagger:hilt-android-testing:2.49")
     kaptTest("com.google.dagger:hilt-compiler:2.49")
+
+    // coroutine
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
 }
