@@ -1,65 +1,335 @@
 package com.example.whatsappautomator.ui.theme
 
-import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerState
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.whatsappautomator.model.AutoMessage
-import com.example.whatsappautomator.viewModel.AutoMessageViewModel
+import java.time.LocalDateTime
 
+@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AutoMessageApp(
     modifier: Modifier=Modifier,
-    autoMessages:List<AutoMessage> = emptyList(),
-    viewModel: AutoMessageViewModel
+    autoMessages:List<AutoMessage> = listOf(AutoMessage(message = "Hi",to="7307140364",time="hh:mm")),
+    addMessage:(AutoMessage)->Unit={},
+    deleteAutoMessage: (AutoMessage) -> Unit={}
 ) {
-    //viewModel.insertMessage()
-   // Log.d("Size3", viewModel.returnSize())
-    val list=viewModel.allMessages.collectAsState().value
-    //Log.e("viewModel",viewModel.allMessages.collectAsState().value.size.toString())
-    Box(modifier = modifier.fillMaxSize()){
-        LazyColumn{
-            items(list){
-                Text(text = it.message)
+    val showDialog= remember {
+        mutableStateOf(false)
+    }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors= TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = DarkGreen
+                ),
+                title = {
+                Text(
+                    "WhatsApp Automator",
+                    color=Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
+            })
+        }
+    ) {paddingValues->
+        Box(modifier = modifier
+            .padding(paddingValues)
+            .fillMaxSize()){
+            LazyColumn(
+                verticalArrangement = Arrangement.Center
+            ){
+                items(autoMessages){
+                    AutoMessageItem(
+                        autoMessage = it,
+                        deleteAutoMessage = deleteAutoMessage
+                    )
+                }
+            }
+            AddAutoMessage(modifier, showDialog)
+            AnimatedVisibility(visible = showDialog.value) {
+                AutoMessageDialog(showDialog, modifier, addMessage)
             }
         }
-        Column(
+    }
+}
+
+//@Preview
+@Composable
+fun AutoMessageItem(
+    modifier: Modifier=Modifier,
+    autoMessage: AutoMessage=AutoMessage(message = "Hi",time="hh:mm",to="7307140364"),
+    deleteAutoMessage:(AutoMessage)->Unit={}
+){
+        Row(
             modifier = modifier
-                .fillMaxSize()
-                .padding(
-                    end = 10.dp,
-                    bottom = 30.dp
-                ),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.End
-        ) {
-            FloatingActionButton(
-                onClick = { viewModel.insertMessage() },
-                shape = CircleShape,
-                containerColor=DarkGreen,
-                contentColor= Color.White,
-                elevation = FloatingActionButtonDefaults.elevation(5.dp),
-                modifier = modifier.size(50.dp)
+                .fillMaxWidth()
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.Start
+        ){
+            Image(
+                imageVector = Icons.Rounded.Person,
+                contentDescription = "person",
+                modifier= modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray),
+                colorFilter= ColorFilter.tint(Color.White)
+            )
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment=Alignment.Start,
+                modifier = modifier.padding(
+                    start=15.dp
+                )
             ) {
-                Icon(imageVector = Icons.Rounded.Add, contentDescription = null)
+                Row(
+                    modifier=modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = autoMessage.to,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier=modifier.weight(3f),
+                        fontSize = TextUnit(25f, type = TextUnitType.Sp)
+                    )
+                    Text(
+                        text = autoMessage.time,
+                        textAlign = TextAlign.End,
+                        color = LightGreen
+//                modifier = modifier.align(
+//                    Alignment.Top
+//                ),
+                        //fontSize = TextUnit(20f, TextUnitType.Sp)
+                    )
+                }
+                Row(
+                    modifier=modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = autoMessage.message,
+                        color = Color.LightGray,
+                        modifier=modifier.padding(
+                            bottom = 10.dp
+                        ).weight(3f)
+                    )
+                    Image(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "delete",
+                        alignment = Alignment.TopEnd,
+                        colorFilter= ColorFilter
+                            .tint(Color.Red),
+                        modifier = modifier.clickable {
+                            deleteAutoMessage(autoMessage)
+                        }
+                    )
+                }
+
+                Divider(
+                    color=Color.LightGray
+                )
+            }
+    }
+}
+
+@Composable
+private fun AddAutoMessage(
+    modifier: Modifier,
+    showDialog: MutableState<Boolean>
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(
+                end = 10.dp,
+                bottom = 30.dp
+            ),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.End
+    ) {
+        FloatingActionButton(
+            onClick = {
+                showDialog.value = true
+            },
+            shape = CircleShape,
+            containerColor = DarkGreen,
+            contentColor = Color.White,
+            elevation = FloatingActionButtonDefaults.elevation(5.dp),
+            modifier = modifier.size(50.dp)
+        ) {
+            Icon(imageVector = Icons.Rounded.Add, contentDescription = null)
+        }
+    }
+}
+
+//@Preview
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun AutoMessageDialog(
+    showDialog: MutableState<Boolean> = mutableStateOf(false),
+    modifier: Modifier=Modifier,
+    addMessage: (AutoMessage) -> Unit={}
+) {
+    Dialog(onDismissRequest = { showDialog.value = false }) {
+        val message = remember {
+            mutableStateOf("")
+        }
+        val phoneNumber = remember {
+            mutableStateOf("")
+        }
+        Column(
+            modifier = modifier.background(Color.White)
+        ) {
+            OutlinedTextField(
+                value = message.value,
+                onValueChange = {
+                    message.value = it
+                },
+                placeholder = {
+                    Text("Enter Message here")
+                },
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(
+                        bottom = 5.dp
+                    ),
+                shape = RoundedCornerShape(5.dp)
+            )
+            OutlinedTextField(
+                value = phoneNumber.value,
+                onValueChange = {
+                    phoneNumber.value = it
+                },
+                placeholder = {
+                    Text("Enter Phone number here")
+                },
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(
+                        bottom = 5.dp
+                    ),
+                shape = RoundedCornerShape(5.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+            )
+            val time = LocalDateTime.now()
+            val timePickerState = remember {
+                TimePickerState(
+                    is24Hour = true,
+                    initialHour = time.hour,
+                    initialMinute = time.minute
+                )
+            }
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = 10.dp,
+                        bottom = 10.dp
+                    ),
+            ) {
+                TimePicker(
+                    state = timePickerState,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center)
+                )
+            }
+            Row(
+                modifier = modifier.padding(
+                    bottom = 0.dp
+                ),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Button(
+                    modifier = modifier
+                        .weight(1f)
+                        .padding(
+                            start = 5.dp,
+                            end = 5.dp
+                        ),
+                    shape = RectangleShape,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DarkGreen,
+                        contentColor = Color.White
+                    ),
+                    onClick = {
+                        addMessage(
+                            AutoMessage(
+                                message = message.value,
+                                to = phoneNumber.value,
+                                time = "${timePickerState.hour}:${timePickerState.minute}"
+                            )
+                        )
+                        showDialog.value = false
+                    }
+                ) {
+                    Text("Add Message")
+                }
+                Button(
+                    onClick = { showDialog.value = false },
+                    shape = RectangleShape,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DarkGreen,
+                        contentColor = Color.White
+                    ),
+                    modifier = modifier
+                        .weight(1f)
+                        .padding(
+                            start = 5.dp,
+                            end = 5.dp
+                        ),
+                ) {
+                    Text(text = "Cancel")
+                }
             }
         }
     }

@@ -22,15 +22,11 @@ class AutoMessageViewModel @Inject constructor(private val autoMessageRepository
             initialValue = emptyList()
         )
 
-    init {
-        insertMessage()
-    }
-
     fun insertMessage(
-        //autoMessage: AutoMessage
+        autoMessage: AutoMessage
     ) {
         viewModelScope.launch {
-            autoMessageRepository.insertAutoMessage(AutoMessage(message = "Hi",to="Diya",time="hh:mm:ss"))
+            autoMessageRepository.insertAutoMessage(autoMessage)
             //Log.d("Size22",allMessages.value.size.toString())
         }
     }
@@ -39,12 +35,6 @@ class AutoMessageViewModel @Inject constructor(private val autoMessageRepository
         viewModelScope.launch {
             autoMessageRepository.deleteAutoMessage(autoMessage)
         }
-    }
-
-    fun returnSize():String {
-        //insertMessage()
-       // Log.d("Size33",allMessages.value.size.toString())
-        return allMessages.value.toString()
     }
 
 
