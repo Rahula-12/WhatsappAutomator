@@ -1,10 +1,13 @@
 package com.example.whatsappautomator
 
+import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Bundle
 import android.provider.Settings
-import android.text.TextUtils.SimpleStringSplitter
+import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
@@ -39,7 +43,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if(!isAccessibilitySettingsOn(applicationContext)) {
+        val packageManager=applicationContext.packageManager
+        val whatsAppIntent=Intent(Intent.ACTION_VIEW)
+        whatsAppIntent.setPackage("com.whatsapp")
+        whatsAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        if(whatsAppIntent.resolveActivity(packageManager)==null) {
+//            Toast.makeText(applicationContext,"Please install WhatsApp first",Toast.LENGTH_SHORT).show()
+//            exitProcess(0)
+//        }
+        if(!isAccessibilityServiceEnabled(applicationContext,WhatsAppAccessibilityService::class.java)) {
             val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
@@ -73,7 +85,8 @@ class MainActivity : ComponentActivity() {
                                 rawNumber.nationalNumber = it.to.toLong()
                                 if (phoneNumberUtil.isValidNumber(rawNumber)) {
                                     val workRequest: PeriodicWorkRequest = periodicWorkRequest(it)
-                                    workManager.enqueueUniquePeriodicWork(it.messageNo, ExistingPeriodicWorkPolicy.REPLACE, workRequest)
+                                    workManager
+                                        .enqueueUniquePeriodicWork(it.messageNo, ExistingPeriodicWorkPolicy.REPLACE, workRequest)
                                     viewModel.insertMessage(it)
                                     return@AutoMessageApp true
                                 }
@@ -105,7 +118,10 @@ class MainActivity : ComponentActivity() {
         }
 
         val diff: Long = calendar.timeInMillis - nowMillis
-
+        val data:Data=Data.Builder()
+            .putString("message",it.message)
+            .putString("phoneNumber",it.to)
+            .build()
         return PeriodicWorkRequest.Builder(
             SendMessageWorker::class.java,
             24,
@@ -114,49 +130,26 @@ class MainActivity : ComponentActivity() {
             TimeUnit.MILLISECONDS
         )
             .setInitialDelay(diff, TimeUnit.MILLISECONDS)
+            .setInputData(data)
             .addTag(it.messageNo)
             .build()
     }
 }
 
-private fun isAccessibilitySettingsOn(mContext: Context): Boolean {
-    var accessibilityEnabled = 0
-    val service: String = "com/example/whatsappautomator/services" + "/" + WhatsAppAccessibilityService::class.java.canonicalName
-    try {
-        accessibilityEnabled = Settings.Secure.getInt(
-            mContext.applicationContext.contentResolver,
-            Settings.Secure.ACCESSIBILITY_ENABLED
-        )
-        //Log.v(TAG, "accessibilityEnabled = $accessibilityEnabled")
-    } catch (e: Settings.SettingNotFoundException) {
-//        Log.e(
-//            TAG, "Error finding setting, default accessibility to not found: "
-//                    + e.getMessage()
-//        )
-    }
-    val mStringColonSplitter = SimpleStringSplitter(':')
-    if (accessibilityEnabled == 1) {
-        //Log.v(TAG, "***ACCESSIBILITY IS ENABLED*** -----------------")
-        val settingValue: String = Settings.Secure.getString(
-            mContext.applicationContext.contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        )
-        if (settingValue != null) {
-            mStringColonSplitter.setString(settingValue)
-            while (mStringColonSplitter.hasNext()) {
-                val accessibilityService = mStringColonSplitter.next()
-//                Log.v(
-//                    TAG,
-//                    "-------------- > accessibilityService :: $accessibilityService $service"
-//                )
-                if (accessibilityService.equals(service, ignoreCase = true)) {
-                    //Log.v(TAG, "We've found the correct setting - accessibility is switched on!")
-                    return true
-                }
-            }
-        }
-    } else {
-       // Log.v(TAG, "***ACCESSIBILITY IS DISABLED***")
+fun isAccessibilityServiceEnabled(
+    context: Context,
+    service: Class<out AccessibilityService?>
+): Boolean {
+    val am: AccessibilityManager =
+        context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+    val enabledServices: List<AccessibilityServiceInfo> =
+        am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+    for (enabledService in enabledServices) {
+        val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
+        if (enabledServiceInfo.packageName.equals(context.packageName) && enabledServiceInfo.name.equals(
+                service.name
+            )
+        ) return true
     }
     return false
 }
