@@ -14,6 +14,5 @@ import java.util.UUID
     val message:String,
     val to:String,
     val time:String,
-    val countryCode:String="",
-    val workId:String=""
+    val countryCode:String=""
 )
