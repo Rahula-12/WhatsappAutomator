@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Whatsapp Automator</string>
+    <string name="whatsapp_accessibility">WhatsApp Accessibility to automate whatsapp</string>
 </resources>
