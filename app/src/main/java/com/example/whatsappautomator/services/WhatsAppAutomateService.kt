@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import java.lang.Exception
 import java.net.URLEncoder
 
@@ -49,7 +50,8 @@ class WhatsAppAutomateService : IntentService("WhatsAppAutomateService") {
                 Thread.sleep(5000)
             }
             else {
-
+                    Toast.makeText(applicationContext,"Please install WhatsApp.",Toast.LENGTH_SHORT).show()
+                    return
             }
         }
         catch (e:Exception) {

@@ -33,6 +33,7 @@ import com.google.i18n.phonenumbers.Phonenumber
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 
 @AndroidEntryPoint
@@ -43,10 +44,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val packageManager=applicationContext.packageManager
-        val whatsAppIntent=Intent(Intent.ACTION_VIEW)
-        whatsAppIntent.setPackage("com.whatsapp")
-        whatsAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        val packageManager=applicationContext.packageManager
+//        val whatsAppIntent=Intent(Intent.ACTION_VIEW)
+//        whatsAppIntent.setPackage("com.whatsapp")
+//        whatsAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 //        if(whatsAppIntent.resolveActivity(packageManager)==null) {
 //            Toast.makeText(applicationContext,"Please install WhatsApp first",Toast.LENGTH_SHORT).show()
 //            exitProcess(0)
