@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -22,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.whatsappautomator.model.AutoMessage
 import com.example.whatsappautomator.scheduling.SendMessageWorker
@@ -33,7 +35,6 @@ import com.google.i18n.phonenumbers.Phonenumber
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
-import kotlin.system.exitProcess
 
 
 @AndroidEntryPoint
@@ -85,9 +86,11 @@ class MainActivity : ComponentActivity() {
                                 rawNumber.countryCode=it.countryCode.toIntOrNull()?:91
                                 rawNumber.nationalNumber = it.to.toLong()
                                 if (phoneNumberUtil.isValidNumber(rawNumber)) {
+
                                     val workRequest: PeriodicWorkRequest = periodicWorkRequest(it)
                                     workManager
                                         .enqueueUniquePeriodicWork(it.messageNo, ExistingPeriodicWorkPolicy.REPLACE, workRequest)
+                                    Log.d("temp",workManager.getWorkInfosByTag(it.messageNo).toString())
                                     viewModel.insertMessage(it)
                                     return@AutoMessageApp true
                                 }
@@ -106,35 +109,34 @@ class MainActivity : ComponentActivity() {
         }
     }
     private fun periodicWorkRequest(it: AutoMessage): PeriodicWorkRequest {
-        val calendar: Calendar = Calendar.getInstance()
-        val nowMillis: Long = calendar.timeInMillis
-
-        calendar.set(Calendar.HOUR_OF_DAY, it.time.subSequence(0, 2).toString().toInt())
-        calendar.set(Calendar.MINUTE, it.time.substring(3).toInt())
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-
-        if (calendar.before(Calendar.getInstance())) {
-            calendar.add(Calendar.DATE, 1)
-        }
-
-        val diff: Long = calendar.timeInMillis - nowMillis
-        val data:Data=Data.Builder()
-            .putString("message",it.message)
-            .putString("phoneNumber",it.to)
-            .build()
-        return PeriodicWorkRequest.Builder(
-            SendMessageWorker::class.java,
-            24,
-            TimeUnit.HOURS,
-            PeriodicWorkRequest.MIN_PERIODIC_FLEX_MILLIS,
-            TimeUnit.MILLISECONDS
-        )
-            .setInitialDelay(diff, TimeUnit.MILLISECONDS)
+        val hour: Int = it.time.substring(0, 2).toInt()
+        val minute: Int = it.time.substring(3).toInt()
+        val data:Data=Data.Builder().putString("phoneNumber",it.to).putString("message",it.message).build()
+        return PeriodicWorkRequestBuilder<SendMessageWorker>(1, TimeUnit.DAYS)
             .setInputData(data)
+            .setInitialDelay(calculateInitialDelay(hour, minute), TimeUnit.MILLISECONDS)
             .addTag(it.messageNo)
             .build()
     }
+
+    private fun calculateInitialDelay(hour: Int, minute: Int): Long {
+        val currentTimeMillis = System.currentTimeMillis()
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = currentTimeMillis
+        calendar.set(Calendar.HOUR_OF_DAY, hour)
+        calendar.set(Calendar.MINUTE, minute)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        val selectedTimeMillis = calendar.timeInMillis
+
+        if (selectedTimeMillis <= currentTimeMillis) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        return selectedTimeMillis - currentTimeMillis
+    }
+
 }
 
 fun isAccessibilityServiceEnabled(
