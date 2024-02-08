@@ -40,7 +40,7 @@ class WhatsAppAutomateService : IntentService("WhatsAppAutomateService") {
     private fun handleActionWhatsApp(mobileNumber: String?, message: String?) {
         try{
             val packageManager=applicationContext.packageManager
-            val url="https://api.whatsapp.com?phone=${mobileNumber}&text=${URLEncoder.encode(message,"UTF-8")}"
+            val url="https://api.whatsapp.com/send?phone=${mobileNumber}&text=${URLEncoder.encode(message,"UTF-8")}"
             val whatsAppIntent=Intent(Intent.ACTION_VIEW)
             whatsAppIntent.setPackage("com.whatsapp")
             whatsAppIntent.data = Uri.parse(url)
@@ -50,7 +50,7 @@ class WhatsAppAutomateService : IntentService("WhatsAppAutomateService") {
                 Thread.sleep(5000)
             }
             else {
-                    Toast.makeText(applicationContext,"Please install WhatsApp.",Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(applicationContext,"Please install WhatsApp.",Toast.LENGTH_SHORT).show()
                     return
             }
         }
