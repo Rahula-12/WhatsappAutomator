@@ -18,13 +18,14 @@ import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = DarkGreen,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    secondary = DarkGreen,
+    tertiary = Pink80,
+    onPrimary = Color.White,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = DarkGreen,
-    secondary = Color(0xFF128c7e),
+    primary = Color.White,
+    secondary = DarkGreen,
     tertiary = Color(0xFF25d366),
     background = Color(0xFFFFFBFE),
     surface = Color(0xFF25d366),
@@ -43,15 +44,16 @@ fun WhatsappAutomatorTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val colorScheme =
+//        when {
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+          //  val context = LocalContext.current
+            if (darkTheme) DarkColorScheme else LightColorScheme
+//        }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+//        darkTheme -> DarkColorScheme
+//        else -> LightColorScheme
+//    }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
