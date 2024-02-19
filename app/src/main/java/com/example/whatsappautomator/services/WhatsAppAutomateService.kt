@@ -40,7 +40,7 @@ class WhatsAppAutomateService : IntentService("WhatsAppAutomateService") {
     private fun handleActionWhatsApp(mobileNumber: String?, message: String?) {
         try{
             val packageManager=applicationContext.packageManager
-            val url="https://api.whatsapp.com/send?phone=${mobileNumber}&text=${URLEncoder.encode(message,"UTF-8")}"
+            val url="https://api.whatsapp.com/send?phone=+91${mobileNumber}&text=${URLEncoder.encode(message,"UTF-8")}"
             val whatsAppIntent=Intent(Intent.ACTION_VIEW)
             whatsAppIntent.setPackage("com.whatsapp")
             whatsAppIntent.data = Uri.parse(url)

@@ -8,6 +8,7 @@ import android.content.pm.ServiceInfo
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.WindowManager
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -58,6 +59,7 @@ class MainActivity : ComponentActivity() {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         }
+
         //val viewModel:AutoMessageViewModel=hiltViewModel<>()
         val workManager=WorkManager.getInstance(applicationContext)
         val phoneNumberUtil=PhoneNumberUtil.getInstance()

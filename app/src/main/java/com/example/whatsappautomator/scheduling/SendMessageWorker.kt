@@ -10,7 +10,7 @@ class SendMessageWorker(val context: Context, workerParameters: WorkerParameters
     override fun doWork(): Result {
         val phoneNumber=inputData.getString("phoneNumber")
         val message=inputData.getString("message")
-        WhatsAppAutomateService.startActionAutomateWhatsApp(applicationContext,phoneNumber!!,message!!)
+        WhatsAppAutomateService.startActionAutomateWhatsApp(context,phoneNumber!!,message!!)
         Log.d("WorkerTest","Test passed")
         return Result.success()
     }
