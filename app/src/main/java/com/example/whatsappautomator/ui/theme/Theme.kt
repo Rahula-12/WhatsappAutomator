@@ -17,14 +17,14 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = DarkGreen,
+    primary = Color.Transparent,
     secondary = DarkGreen,
     tertiary = Pink80,
     onPrimary = Color.White,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color.White,
+    primary = Color.Transparent,
     secondary = DarkGreen,
     tertiary = Color(0xFF25d366),
     background = Color(0xFFFFFBFE),
@@ -59,7 +59,7 @@ fun WhatsappAutomatorTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
         }
     }
 

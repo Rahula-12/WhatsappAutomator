@@ -46,6 +46,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -88,7 +91,8 @@ fun AutoMessageApp(
                     Text(
                         "WhatsApp Automator",
                         color = MaterialTheme.colorScheme.onPrimary,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Medium,
+                        fontSize = TextUnit(25f,TextUnitType.Sp)
                     )
                 })
         }
@@ -129,68 +133,73 @@ fun AutoMessageItem(
             .padding(10.dp),
         horizontalArrangement = Arrangement.Start
     ) {
-        Image(
-            imageVector = Icons.Rounded.Person,
-            contentDescription = "person",
-            modifier = modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.LightGray),
-            colorFilter = ColorFilter.tint(Color.White)
-        )
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-            modifier = modifier.padding(
-                start = 15.dp
-            )
+        Row(
+            modifier=modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = autoMessage.to,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = modifier.weight(3f),
-                    fontSize = TextUnit(25f, type = TextUnitType.Sp)
+            Image(
+                imageVector = Icons.Rounded.Person,
+                contentDescription = "person",
+                modifier = modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray),
+                colorFilter = ColorFilter.tint(Color.White)
+            )
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+                modifier = modifier.padding(
+                    start = 15.dp
                 )
-                Text(
-                    text = autoMessage.time,
-                    textAlign = TextAlign.End,
-                    color = LightGreen
+            ) {
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = autoMessage.to,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = modifier.weight(3f),
+                        fontSize = TextUnit(25f, type = TextUnitType.Sp)
+                    )
+                    Text(
+                        text = autoMessage.time,
+                        textAlign = TextAlign.End,
+                        color = LightGreen
 //                modifier = modifier.align(
 //                    Alignment.Top
 //                ),
-                    //fontSize = TextUnit(20f, TextUnitType.Sp)
-                )
-            }
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = autoMessage.message,
-                    color = Color.LightGray,
-                    modifier = modifier
-                        .padding(
-                            bottom = 10.dp
-                        )
-                        .weight(3f)
-                )
-                Image(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "delete",
-                    alignment = Alignment.TopEnd,
-                    colorFilter = ColorFilter
-                        .tint(Color.Red),
-                    modifier = modifier.clickable {
-                        deleteAutoMessage(autoMessage)
-                    }
-                )
-            }
+                        //fontSize = TextUnit(20f, TextUnitType.Sp)
+                    )
+                }
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = autoMessage.message,
+                        color = Color.LightGray,
+                        modifier = modifier
+                            .padding(
+                                bottom = 10.dp
+                            )
+                            .weight(3f)
+                    )
+                    Image(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "delete",
+                        alignment = Alignment.TopEnd,
+                        colorFilter = ColorFilter
+                            .tint(Color.Red),
+                        modifier = modifier.clickable {
+                            deleteAutoMessage(autoMessage)
+                        }
+                    )
+                }
 
-            Divider(
-                color = Color.LightGray
-            )
+                Divider(
+                    color = Color.LightGray
+                )
+            }
         }
     }
 }
