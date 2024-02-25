@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.work.BackoffPolicy
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
@@ -118,6 +119,7 @@ class MainActivity : ComponentActivity() {
             .setInputData(data)
             .setInitialDelay(calculateInitialDelay(hour, minute), TimeUnit.MILLISECONDS)
             .addTag(it.messageNo)
+            .setBackoffCriteria(BackoffPolicy.LINEAR,PeriodicWorkRequest.MIN_PERIODIC_FLEX_MILLIS,TimeUnit.MILLISECONDS)
             .build()
     }
 
@@ -136,7 +138,7 @@ class MainActivity : ComponentActivity() {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
 
-        return selectedTimeMillis - currentTimeMillis
+        return calendar.timeInMillis - currentTimeMillis
     }
 
 }

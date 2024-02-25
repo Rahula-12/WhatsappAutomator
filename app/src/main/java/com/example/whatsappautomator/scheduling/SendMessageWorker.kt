@@ -8,11 +8,15 @@ import com.example.whatsappautomator.services.WhatsAppAutomateService
 
 class SendMessageWorker(val context: Context, workerParameters: WorkerParameters):Worker(context,workerParameters){
     override fun doWork(): Result {
-        val phoneNumber=inputData.getString("phoneNumber")
-        val message=inputData.getString("message")
-        WhatsAppAutomateService.startActionAutomateWhatsApp(context,phoneNumber!!,message!!)
-        Log.d("WorkerTest","Test passed")
-        return Result.success()
+        return try {
+            val phoneNumber=inputData.getString("phoneNumber")
+            val message=inputData.getString("message")
+            WhatsAppAutomateService.startActionAutomateWhatsApp(context,phoneNumber!!,message!!)
+            Log.d("WorkerTest","Test passed")
+            Result.success()
+        } catch (e:Exception) {
+            Result.retry()
+        }
     }
 
 }
