@@ -1,7 +1,6 @@
 package com.example.whatsappautomator.services
 
 import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_AUDIBLE
 import android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_GENERIC
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo

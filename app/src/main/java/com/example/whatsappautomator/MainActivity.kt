@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Bundle
 import android.provider.Settings
@@ -48,69 +49,93 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        val packageManager=applicationContext.packageManager
-//        val whatsAppIntent=Intent(Intent.ACTION_VIEW)
-//        whatsAppIntent.setPackage("com.whatsapp")
-//        whatsAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        if(whatsAppIntent.resolveActivity(packageManager)==null) {
-//            Toast.makeText(applicationContext,"Please install WhatsApp first",Toast.LENGTH_SHORT).show()
-//            exitProcess(0)
-//        }
-        if(!isAccessibilityServiceEnabled(applicationContext,WhatsAppAccessibilityService::class.java)) {
-            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-        }
+        if (!isWhatsAppInstalled(this)) {
+            Toast.makeText(applicationContext, "Please install WhatsApp first", Toast.LENGTH_SHORT)
+                .show()
+            finish()
+        } else {
+            if (!isAccessibilityServiceEnabled(
+                    applicationContext,
+                    WhatsAppAccessibilityService::class.java
+                )
+            ) {
+                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            }
 
-        //val viewModel:AutoMessageViewModel=hiltViewModel<>()
-        val workManager=WorkManager.getInstance(applicationContext)
-        val phoneNumberUtil=PhoneNumberUtil.getInstance()
-        setContent {
-            val viewModel= viewModel<AutoMessageViewModel>()
-            WhatsappAutomatorTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    AutoMessageApp(
-                        autoMessages = viewModel.allMessages.collectAsState().value,
-                        addMessage = {
-                            if(it.message.isEmpty()) {
-                                Toast.makeText(this,"Please enter message",Toast.LENGTH_LONG).show()
-                            }
-                            else if(it.to.isNullOrEmpty()) {
-                                Toast.makeText(this,"Please enter phone number",Toast.LENGTH_LONG).show()
-                            }
-                            else if(it.countryCode.isNullOrEmpty()) {
-                                Toast.makeText(this,"Please enter county code",Toast.LENGTH_LONG).show()
-                            }
-                            else {
-                                val rawNumber = Phonenumber.PhoneNumber()
-                                rawNumber.countryCode=it.countryCode.toIntOrNull()?:91
-                                rawNumber.nationalNumber = it.to.toLong()
-                                if (phoneNumberUtil.isValidNumber(rawNumber)) {
+            //val viewModel:AutoMessageViewModel=hiltViewModel<>()
+            val workManager = WorkManager.getInstance(applicationContext)
+            val phoneNumberUtil = PhoneNumberUtil.getInstance()
+            setContent {
+                val viewModel = viewModel<AutoMessageViewModel>()
+                WhatsappAutomatorTheme {
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        AutoMessageApp(
+                            autoMessages = viewModel.allMessages.collectAsState().value,
+                            addMessage = {
+                                if (it.message.isEmpty()) {
+                                    Toast.makeText(this, "Please enter message", Toast.LENGTH_LONG)
+                                        .show()
+                                } else if (it.to.isNullOrEmpty()) {
+                                    Toast.makeText(
+                                        this,
+                                        "Please enter phone number",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else if (it.countryCode.isNullOrEmpty()) {
+                                    Toast.makeText(
+                                        this,
+                                        "Please enter county code",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    val rawNumber = Phonenumber.PhoneNumber()
+                                    rawNumber.countryCode = it.countryCode.toIntOrNull() ?: 91
+                                    rawNumber.nationalNumber = it.to.toLong()
+                                    if (phoneNumberUtil.isValidNumber(rawNumber)) {
 
-                                    val workRequest: PeriodicWorkRequest = periodicWorkRequest(it)
-                                    workManager
-                                        .enqueueUniquePeriodicWork(it.messageNo, ExistingPeriodicWorkPolicy.REPLACE, workRequest)
-                                    Log.d("temp",workManager.getWorkInfosByTag(it.messageNo).toString())
-                                    viewModel.insertMessage(it)
-                                    return@AutoMessageApp true
+                                        val workRequest: PeriodicWorkRequest =
+                                            periodicWorkRequest(it)
+                                        workManager
+                                            .enqueueUniquePeriodicWork(
+                                                it.messageNo,
+                                                ExistingPeriodicWorkPolicy.REPLACE,
+                                                workRequest
+                                            )
+                                        Log.d(
+                                            "temp",
+                                            workManager.getWorkInfosByTag(it.messageNo).toString()
+                                        )
+                                        viewModel.insertMessage(it)
+                                        return@AutoMessageApp true
+                                    } else
+                                        Toast.makeText(
+                                            this,
+                                            "Please enter correct phone number",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                 }
-                                else
-                                    Toast.makeText(this,"Please enter correct phone number",Toast.LENGTH_LONG).show()
+                                return@AutoMessageApp false
+                            },
+                            deleteAutoMessage = {
+                                workManager.cancelAllWorkByTag(it.messageNo)
+                                viewModel.deleteMessage(it)
                             }
-                            return@AutoMessageApp false
-                        },
-                        deleteAutoMessage = {
-                            workManager.cancelAllWorkByTag(it.messageNo)
-                            viewModel.deleteMessage(it)
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("Des","OnDestroy called")
     }
     private fun periodicWorkRequest(it: AutoMessage): PeriodicWorkRequest {
         val hour: Int = it.time.substring(0, 2).toInt()
@@ -160,6 +185,16 @@ fun isAccessibilityServiceEnabled(
         ) return true
     }
     return false
+}
+
+fun isWhatsAppInstalled(context: Context): Boolean {
+    val packageManager = context.packageManager
+    return try {
+        packageManager.getPackageInfo("com.whatsapp", PackageManager.GET_ACTIVITIES)
+        true // WhatsApp is installed
+    } catch (e: PackageManager.NameNotFoundException) {
+        false // WhatsApp is not installed
+    }
 }
 
 @Preview(showBackground = true)
