@@ -14,6 +14,7 @@ import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.BackoffPolicy
 import androidx.work.Data
@@ -68,7 +70,7 @@ class MainActivity : ComponentActivity() {
             val workManager = WorkManager.getInstance(applicationContext)
             val phoneNumberUtil = PhoneNumberUtil.getInstance()
             setContent {
-                val viewModel = viewModel<AutoMessageViewModel>()
+                val viewModel:AutoMessageViewModel by viewModels()
                 WhatsappAutomatorTheme {
                     // A surface container using the 'background' color from the theme
                     Surface(
