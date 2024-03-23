@@ -282,9 +282,10 @@ private fun AutoMessageDialog(
                     onValueChange = {
                         phoneNumber.value = it
                     },
+                    singleLine=true,
                     placeholder = {
                         Text(
-                            text = "Enter Phone number here",
+                            text = "Enter Phone number",
                             color = Color.LightGray
                         )
                     },

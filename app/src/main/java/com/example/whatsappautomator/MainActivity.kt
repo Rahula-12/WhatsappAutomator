@@ -9,7 +9,6 @@ import android.content.pm.ServiceInfo
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.WindowManager
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -22,10 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.BackoffPolicy
-import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
@@ -41,7 +37,6 @@ import com.google.i18n.phonenumbers.Phonenumber
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
-import kotlin.system.exitProcess
 
 
 @AndroidEntryPoint
@@ -148,7 +143,7 @@ class MainActivity : ComponentActivity() {
             .setInputData(data)
             .setInitialDelay(calculateInitialDelay(hour, minute), TimeUnit.MILLISECONDS)
             .addTag(it.messageNo)
-            .setBackoffCriteria(BackoffPolicy.LINEAR,PeriodicWorkRequest.MIN_PERIODIC_FLEX_MILLIS,TimeUnit.MILLISECONDS)
+            .setBackoffCriteria(BackoffPolicy.LINEAR,1000L,TimeUnit.MILLISECONDS)
             .build()
     }
 

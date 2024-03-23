@@ -32,7 +32,7 @@ class WhatsAppAccessibilityService: AccessibilityService() {
         if(!sendButton.isVisibleToUser) return
         sendButton.performAction(AccessibilityNodeInfo.ACTION_CLICK)
         try{
-            Thread.sleep(2000)
+            Thread.sleep(3000)
             performGlobalAction(GLOBAL_ACTION_BACK)
             Thread.sleep(2000)
         }
