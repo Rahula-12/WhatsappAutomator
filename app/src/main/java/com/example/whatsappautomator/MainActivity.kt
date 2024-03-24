@@ -143,7 +143,7 @@ class MainActivity : ComponentActivity() {
             .setInputData(data)
             .setInitialDelay(calculateInitialDelay(hour, minute), TimeUnit.MILLISECONDS)
             .addTag(it.messageNo)
-            .setBackoffCriteria(BackoffPolicy.LINEAR,1000L,TimeUnit.MILLISECONDS)
+            .setBackoffCriteria(BackoffPolicy.LINEAR,100L,TimeUnit.MILLISECONDS)
             .build()
     }
 
