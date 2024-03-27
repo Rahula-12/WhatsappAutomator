@@ -59,6 +59,8 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:+")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.0.0")
     val lifecycle_version = "2.7.0"
     val arch_version = "2.2.0"
 

@@ -4,9 +4,11 @@ import android.app.DatePickerDialog
 import android.widget.DatePicker
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -117,7 +119,8 @@ fun AutoMessageApp(
                 items(autoMessages) {
                     AutoMessageItem(
                         autoMessage = it,
-                        deleteAutoMessage = deleteAutoMessage
+                        deleteAutoMessage = deleteAutoMessage,
+                        showDialog = showDialog
                     )
                 }
             }
@@ -130,16 +133,26 @@ fun AutoMessageApp(
 }
 
 //@Preview
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AutoMessageItem(
     modifier: Modifier = Modifier,
     autoMessage: AutoMessage = AutoMessage(message = "Hi", time = "hh:mm", to = "7307140364"),
-    deleteAutoMessage: (AutoMessage) -> Unit = {}
+    deleteAutoMessage: (AutoMessage) -> Unit = {},
+    showDialog: MutableState<Boolean>
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(10.dp)
+            .combinedClickable(
+                onClick = {
+
+                },
+                onLongClick = {
+                    showDialog.value=true
+                }
+            ),
         horizontalArrangement = Arrangement.Start
     ) {
         Row(
@@ -248,17 +261,18 @@ private fun AddAutoMessage(
 private fun AutoMessageDialog(
     showDialog: MutableState<Boolean> = mutableStateOf(false),
     modifier: Modifier = Modifier,
-    addMessage: (AutoMessage) -> Boolean = { false }
+    addMessage: (AutoMessage) -> Boolean = { false },
+    autoMessage: AutoMessage?=null
 ) {
     Dialog(onDismissRequest = { showDialog.value = false }) {
         val message = remember {
-            mutableStateOf("")
+            mutableStateOf(autoMessage?.message?:"")
         }
         val phoneNumber = remember {
-            mutableStateOf("")
+            mutableStateOf(autoMessage?.to?:"")
         }
         val countryCode = remember {
-            mutableStateOf("")
+            mutableStateOf(autoMessage?.countryCode?:"")
         }
         val time = LocalDateTime.now()
         val timePickerState = remember {
@@ -366,8 +380,8 @@ private fun StartAndEndDate(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                start = 5.dp,
-                end = 5.dp
+                start = if(!forever.value) 5.dp else 0.dp,
+                end = if(!forever.value) 5.dp else 0.dp
             ),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -385,7 +399,7 @@ private fun StartAndEndDate(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(5.dp)
+                .padding(if(!forever.value)5.dp else 0.dp)
         ) {
             Text(text = startDate.value)
         }
