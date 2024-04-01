@@ -142,7 +142,7 @@ class MainActivity : ComponentActivity() {
         return PeriodicWorkRequestBuilder<SendMessageWorker>(1, TimeUnit.DAYS)
             .setInputData(data)
             .setInitialDelay(calculateInitialDelay(hour, minute), TimeUnit.MILLISECONDS)
-            .addTag(it.messageNo)
+            .addTag(it.messageNo+" "+it.to+" "+it.message+" "+it.time)
             .setBackoffCriteria(BackoffPolicy.LINEAR,100L,TimeUnit.MILLISECONDS)
             .build()
     }

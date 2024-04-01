@@ -18,9 +18,11 @@ class SendMessageWorker(val context: Context, workerParameters: WorkerParameters
     override suspend fun doWork(): Result {
         val keyguardManager =
             applicationContext.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            while(keyguardManager.isKeyguardLocked) {
+            val started=System.currentTimeMillis()
+            while(keyguardManager.isKeyguardLocked && System.currentTimeMillis()-started<=15*60000L) {
 
             }
+            if(System.currentTimeMillis()-started>15*60000L)    return Result.retry()
             while (serviceStarted) {
 
             }
