@@ -121,7 +121,7 @@ class MainActivity : ComponentActivity() {
                                 return@AutoMessageApp false
                             },
                             deleteAutoMessage = {
-                                workManager.cancelAllWorkByTag(it.messageNo)
+                                workManager.cancelAllWorkByTag(it.messageNo+" "+it.to+" "+it.message+" "+it.time)
                                 viewModel.deleteMessage(it)
                             }
                         )
