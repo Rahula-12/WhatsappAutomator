@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
                                 } else if (it.countryCode.isNullOrEmpty()) {
                                     Toast.makeText(
                                         this,
-                                        "Please enter county code",
+                                        "Please enter country code",
                                         Toast.LENGTH_LONG
                                     ).show()
                                 } else {
@@ -138,7 +138,13 @@ class MainActivity : ComponentActivity() {
     private fun periodicWorkRequest(it: AutoMessage): PeriodicWorkRequest {
         val hour: Int = it.time.substring(0, 2).toInt()
         val minute: Int = it.time.substring(3).toInt()
-        val data:Data=Data.Builder().putString("phoneNumber",it.to).putString("message",it.message).build()
+        val data:Data=Data.Builder()
+                        .putString("phoneNumber",it.to)
+                        .putString("message",it.message)
+            .putString("id",it.messageNo)
+            .putString("time",it.time)
+            .putString("countryCode",it.countryCode)
+                        .build()
         return PeriodicWorkRequestBuilder<SendMessageWorker>(1, TimeUnit.DAYS)
             .setInputData(data)
             .setInitialDelay(calculateInitialDelay(hour, minute), TimeUnit.MILLISECONDS)

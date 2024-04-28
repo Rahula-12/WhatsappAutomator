@@ -16,6 +16,7 @@ private const val ACTION_WHATSAPP = "com.example.whatsappautomator.services.acti
 // TODO: Rename parameters
 private const val MOBILE_NUMBER = "com.example.whatsappautomator.services.extra.PARAM1"
 private const val MESSAGE = "com.example.whatsappautomator.services.extra.PARAM2"
+private const val COUNTRYCODE = "com.example.whatsappautomator.services.extra.PARAM3"
 
 /**
  * An [IntentService] subclass for handling asynchronous task requests in
@@ -30,17 +31,18 @@ class WhatsAppAutomateService : IntentService("WhatsAppAutomateService") {
     override fun onHandleIntent(intent: Intent?) {
         val mobileNumber :String?= intent!!.getStringExtra(MOBILE_NUMBER)
         val message = intent.getStringExtra(MESSAGE)
-        handleActionWhatsApp(mobileNumber, message)
+        val countryCode=intent.getStringExtra(COUNTRYCODE)
+        handleActionWhatsApp(mobileNumber, message,countryCode)
     }
 
     /**
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private fun handleActionWhatsApp(mobileNumber: String?, message: String?) {
+    private fun handleActionWhatsApp(mobileNumber: String?, message: String?,countryCode: String?) {
         try{
             val packageManager=applicationContext.packageManager
-            val url="https://api.whatsapp.com/send?phone=+91${mobileNumber}&text=${URLEncoder.encode(message,"UTF-8")}"
+            val url="https://api.whatsapp.com/send?phone=+${countryCode}${mobileNumber}&text=${URLEncoder.encode(message,"UTF-8")}"
             val whatsAppIntent=Intent(Intent.ACTION_VIEW)
             whatsAppIntent.setPackage("com.whatsapp")
             whatsAppIntent.data = Uri.parse(url)
@@ -68,11 +70,12 @@ class WhatsAppAutomateService : IntentService("WhatsAppAutomateService") {
          */
         // TODO: Customize helper method
         @JvmStatic
-        fun startActionAutomateWhatsApp(context: Context, mobileNumber: String, message: String) {
+        fun startActionAutomateWhatsApp(context: Context, mobileNumber: String, message: String,countryCode:String) {
             val intent = Intent(context, WhatsAppAutomateService::class.java).apply {
                 action = ACTION_WHATSAPP
                 putExtra(MOBILE_NUMBER, mobileNumber)
                 putExtra(MESSAGE, message)
+                putExtra(COUNTRYCODE,countryCode)
             }
             context.startService(intent)
         }

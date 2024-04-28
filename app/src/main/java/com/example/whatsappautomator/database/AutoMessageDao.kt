@@ -19,4 +19,7 @@ interface AutoMessageDao {
     @Query("Select * from AutoMessage")
     fun getAllMessages(): Flow<List<AutoMessage>>
 
+    @Query("Delete from AutoMessage where s_no=:id")
+    suspend fun deleteMessageBasedOnId(id:String)
+
 }

@@ -12,4 +12,6 @@ class AutoMessageRepository @Inject constructor(private val autoMessageDao: Auto
 
     fun getAllAutoMessages()=autoMessageDao.getAllMessages()
 
+    suspend fun deleteMessageBasedOnId(id:String)=autoMessageDao.deleteMessageBasedOnId(id)
+
 }

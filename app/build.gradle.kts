@@ -153,4 +153,10 @@ dependencies {
 
     // optional - Multiprocess support
     implementation("androidx.work:work-multiprocess:$work_version")
+
+    // hilt worker dependencies
+    implementation("androidx.hilt:hilt-work:1.0.0")
+
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
+
 }
