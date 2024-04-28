@@ -40,6 +40,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerState
@@ -65,6 +66,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.whatsappautomator.model.AutoMessage
 import com.example.whatsappautomator.ui.theme.DarkGreen
 import com.example.whatsappautomator.ui.theme.LightGreen
@@ -100,7 +102,7 @@ fun AutoMessageApp(
                     Text(
                         "WhatsApp Automator",
                         color = MaterialTheme.colorScheme.onPrimary,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.W600,
                         fontSize = TextUnit(25f,TextUnitType.Sp)
                     )
                 })
@@ -186,7 +188,7 @@ fun AutoMessageItem(
                 ) {
                     Text(
                         text = autoMessage.message,
-                        color = Color.LightGray,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = modifier
                             .padding(
                                 bottom = 10.dp
@@ -260,7 +262,7 @@ private fun AutoMessageDialog(
         val countryCode = remember {
             mutableStateOf("")
         }
-        val time = LocalDateTime.now()
+        val time = LocalDateTime.now().plusMinutes(1L)
         val timePickerState = remember {
             TimePickerState(
                 is24Hour = true,
@@ -290,15 +292,15 @@ private fun AutoMessageDialog(
             }, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
         )
         Column(
-            modifier = modifier.background(Color.White)
+            modifier = modifier.background(MaterialTheme.colorScheme.primary)
         ) {
             InputMessage(message, modifier)
             PhoneNumberWithCode(modifier, countryCode, phoneNumber)
             InputTime(modifier, timePickerState)
 
 //            datePickerDialog.show()
-            StartAndEndDate(modifier, datePickerDialog1,datePickerDialog2,forever,startDate,endDate)
-            ForeverSchedule(modifier,forever)
+            //StartAndEndDate(modifier, datePickerDialog1,datePickerDialog2,forever,startDate,endDate)
+           // ForeverSchedule(modifier,forever)
             DecisionButtons(
                 modifier,
                 addMessage,
@@ -410,6 +412,7 @@ private fun StartAndEndDate(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PhoneNumberWithCode(
     modifier: Modifier,
@@ -420,6 +423,7 @@ private fun PhoneNumberWithCode(
         modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
+            singleLine=true,
             value = countryCode.value,
             onValueChange = {
                 countryCode.value = it
@@ -427,7 +431,7 @@ private fun PhoneNumberWithCode(
             placeholder = {
                 Text(
                     text = "+91",
-                    color = Color.LightGray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
             },
@@ -435,7 +439,10 @@ private fun PhoneNumberWithCode(
                 .weight(1f)
                 .padding(5.dp),
             shape = RoundedCornerShape(5.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            colors=TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor =DarkGreen
+            )
         )
         OutlinedTextField(
             value = phoneNumber.value,
@@ -446,14 +453,17 @@ private fun PhoneNumberWithCode(
             placeholder = {
                 Text(
                     text = "Enter Phone number",
-                    color = Color.LightGray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             },
             modifier = modifier
                 .weight(3f)
                 .padding(5.dp),
             shape = RoundedCornerShape(5.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            colors=TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor=DarkGreen
+            )
         )
     }
 }
@@ -550,12 +560,19 @@ private fun InputTime(
                 .fillMaxWidth()
                 .align(Alignment.Center),
             colors=TimePickerDefaults.colors(
-                containerColor=LightGreen
+                clockDialColor = DarkGreen,
+                clockDialUnselectedContentColor=Color.White,
+                clockDialSelectedContentColor=Color.DarkGray,
+                selectorColor=MaterialTheme.colorScheme.surface,
+                timeSelectorSelectedContainerColor = DarkGreen,
+                timeSelectorSelectedContentColor=Color.White,
+                timeSelectorUnselectedContainerColor = Color.Transparent
             )
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InputMessage(
     message: MutableState<String>,
@@ -566,15 +583,19 @@ private fun InputMessage(
         onValueChange = {
             message.value = it
         },
+        singleLine = true,
         placeholder = {
             Text(
                 text = "Enter Message",
-                color = Color.LightGray
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         modifier = modifier
             .fillMaxWidth()
             .padding(5.dp),
-        shape = RoundedCornerShape(5.dp)
+        shape = RoundedCornerShape(5.dp),
+        colors=TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor=DarkGreen
+        )
     )
 }
