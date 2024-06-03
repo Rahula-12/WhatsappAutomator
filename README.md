@@ -18,6 +18,8 @@ An Android application that automates sending WhatsApp messages to a specific ph
 
 The WhatsApp Automator is an Android application designed to automate the sending of WhatsApp messages to a specified phone number at a predetermined time every day. This can be particularly useful for sending daily reminders, updates, or any recurring messages.
 
+<b>Kindly note that the device should not be locked while using the application.</b>
+
 To run it on your device, use this [link](https://github.com/Rahula-12/WhatsappAutomator/releases/download/WhatsappAutomator/WhatsAppAutomator.apk)
 
 ## Features
