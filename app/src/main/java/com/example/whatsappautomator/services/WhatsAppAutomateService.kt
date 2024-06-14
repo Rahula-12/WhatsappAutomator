@@ -49,7 +49,7 @@ class WhatsAppAutomateService : IntentService("WhatsAppAutomateService") {
             whatsAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             if(whatsAppIntent.resolveActivity(packageManager)!=null) {
                 applicationContext.startActivity(whatsAppIntent)
-                Thread.sleep(5000)
+            //    Thread.sleep(5000)
             }
             else {
                     //Toast.makeText(applicationContext,"Please install WhatsApp.",Toast.LENGTH_SHORT).show()

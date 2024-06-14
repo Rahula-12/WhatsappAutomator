@@ -1,8 +1,10 @@
 package com.example.whatsappautomator.scheduling
 
 import android.app.KeyguardManager
+import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
@@ -12,6 +14,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.example.whatsappautomator.R
 import com.example.whatsappautomator.model.AutoMessage
 import com.example.whatsappautomator.repository.AutoMessageRepository
 import com.example.whatsappautomator.services.WhatsAppAutomateService
@@ -19,6 +22,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 @HiltWorker
 class SendMessageWorker @AssistedInject constructor(
@@ -87,6 +91,11 @@ class SendMessageWorker @AssistedInject constructor(
             Log.d("WorkerTest","Test passed")
            // serviceStarted=false
 //            wakeLock.release()
+            sendNotification(
+                phoneNumber = phoneNumber,
+                countryCode = countryCode,
+                message = message
+            )
             Result.success()
         } catch (e:Exception) {
             Result.retry()
@@ -127,6 +136,19 @@ class SendMessageWorker @AssistedInject constructor(
         }
 
         return calendar.timeInMillis - currentTimeMillis
+    }
+
+    private fun sendNotification(phoneNumber:String,message:String,countryCode:String) {
+        val id= Random.nextInt()
+        val notification=NotificationCompat.Builder(
+            context,"success_channel"
+        )
+            .setSmallIcon(R.drawable.person)
+            .setContentTitle("Message Delivered")
+            .setContentTitle("Message \"${message.trim()}\" delivered to +${countryCode}${phoneNumber} successfully.")
+            .build()
+        val notificationManager=context.getSystemService(NotificationManager::class.java)
+        notificationManager.notify(id,notification)
     }
 
 }
