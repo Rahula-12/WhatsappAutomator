@@ -3,6 +3,8 @@ package com.example.whatsappautomator.scheduling
 import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -35,6 +37,8 @@ class SendMessageWorker @AssistedInject constructor(
         var serviceStarted=false
     }
     override suspend fun doWork(): Result {
+        val networkConnectivity=isNetworkAvailable(context)
+        if(!networkConnectivity)    return Result.retry()
         val keyguardManager =
             applicationContext.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
             val started=System.currentTimeMillis()
@@ -143,12 +147,21 @@ class SendMessageWorker @AssistedInject constructor(
         val notification=NotificationCompat.Builder(
             context,"success_channel"
         )
-            .setSmallIcon(R.drawable.person)
+            .setSmallIcon(R.mipmap.ic_launcher_round)
             .setContentTitle("Message Delivered")
             .setContentTitle("Message \"${message.trim()}\" delivered to +${countryCode}${phoneNumber} successfully.")
             .build()
         val notificationManager=context.getSystemService(NotificationManager::class.java)
         notificationManager.notify(id,notification)
+    }
+
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 
 }
