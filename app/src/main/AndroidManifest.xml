@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <queries>
         <package android:name="com.whatsapp"/>
         <package android:name="com.whatsapp.w4b"/>

@@ -499,7 +499,7 @@ private fun DecisionButtons(
             onClick = {
                 if (addMessage(
                         AutoMessage(
-                            message = message.value + "   ",
+                            message = message.value,
                             to = phoneNumber.value,
                             countryCode = countryCode.value,
                             time = "${

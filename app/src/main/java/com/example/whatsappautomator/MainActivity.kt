@@ -28,6 +28,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.whatsappautomator.model.AutoMessage
+import com.example.whatsappautomator.scheduling.AlarmSchedulerImpl
 import com.example.whatsappautomator.scheduling.SendMessageWorker
 import com.example.whatsappautomator.services.WhatsAppAccessibilityService
 import com.example.whatsappautomator.ui.theme.WhatsappAutomatorTheme
@@ -105,10 +106,12 @@ class MainActivity : ComponentActivity() {
                                                 ExistingPeriodicWorkPolicy.REPLACE,
                                                 workRequest
                                             )
-                                        Log.d(
-                                            "temp",
-                                            workManager.getWorkInfosByTag(it.messageNo).toString()
-                                        )
+//                                        val alarmSchedulerImpl=AlarmSchedulerImpl(this)
+//                                        alarmSchedulerImpl.schedule(it)
+//                                        Log.d(
+//                                            "temp",
+//                                            workManager.getWorkInfosByTag(it.messageNo).toString()
+//                                        )
                                         viewModel.insertMessage(it)
                                         return@AutoMessageApp true
                                     } else
@@ -122,6 +125,8 @@ class MainActivity : ComponentActivity() {
                             },
                             deleteAutoMessage = {
                                 workManager.cancelAllWorkByTag(it.messageNo+" "+it.to+" "+it.message+" "+it.time)
+//                                val alarmSchedulerImpl=AlarmSchedulerImpl(this)
+//                                alarmSchedulerImpl.cancel(it)
                                 viewModel.deleteMessage(it)
                             }
                         )
