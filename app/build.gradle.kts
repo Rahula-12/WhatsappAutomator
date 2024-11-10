@@ -4,6 +4,8 @@ plugins {
     id ("com.google.devtools.ksp")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -59,6 +61,7 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
+    implementation("com.google.firebase:firebase-crashlytics:19.2.1")
     val lifecycle_version = "2.7.0"
     val arch_version = "2.2.0"
 

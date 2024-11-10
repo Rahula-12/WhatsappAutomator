@@ -28,7 +28,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.whatsappautomator.model.AutoMessage
-import com.example.whatsappautomator.scheduling.AlarmSchedulerImpl
 import com.example.whatsappautomator.scheduling.SendMessageWorker
 import com.example.whatsappautomator.services.WhatsAppAccessibilityService
 import com.example.whatsappautomator.ui.theme.WhatsappAutomatorTheme
@@ -48,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        throw Exception("Random exception")
         if (!isWhatsAppInstalled(this)) {
             Toast.makeText(applicationContext, "Please install WhatsApp first", Toast.LENGTH_SHORT)
                 .show()

@@ -18,7 +18,6 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.whatsappautomator.R
 import com.example.whatsappautomator.model.AutoMessage
-import com.example.whatsappautomator.repository.AutoMessageRepository
 import com.example.whatsappautomator.services.WhatsAppAutomateService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -26,11 +25,9 @@ import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-@HiltWorker
-class SendMessageWorker @AssistedInject constructor(
-    @Assisted val context: Context,
-    @Assisted workerParameters: WorkerParameters,
-    val autoMessageRepository: AutoMessageRepository
+class SendMessageWorker(
+   private val context: Context,
+   workerParameters: WorkerParameters
 ):
     CoroutineWorker(context,workerParameters){
     companion object {
