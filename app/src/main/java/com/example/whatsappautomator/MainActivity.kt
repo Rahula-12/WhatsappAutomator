@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.BackoffPolicy
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -28,6 +30,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.whatsappautomator.model.AutoMessage
+import com.example.whatsappautomator.scheduling.AlarmSchedulerImpl
 import com.example.whatsappautomator.scheduling.SendMessageWorker
 import com.example.whatsappautomator.services.WhatsAppAccessibilityService
 import com.example.whatsappautomator.ui.theme.WhatsappAutomatorTheme
@@ -66,8 +69,8 @@ class MainActivity : ComponentActivity() {
             //val viewModel:AutoMessageViewModel=hiltViewModel<>()
             val workManager = WorkManager.getInstance(applicationContext)
             val phoneNumberUtil = PhoneNumberUtil.getInstance()
+            val viewModel:AutoMessageViewModel by viewModels()
             setContent {
-                val viewModel:AutoMessageViewModel by viewModels()
                 WhatsappAutomatorTheme {
                     // A surface container using the 'background' color from the theme
                     Surface(
@@ -106,7 +109,7 @@ class MainActivity : ComponentActivity() {
                                                 ExistingPeriodicWorkPolicy.REPLACE,
                                                 workRequest
                                             )
-//                                        val alarmSchedulerImpl=AlarmSchedulerImpl(this)
+//                                        val alarmSchedulerImpl= AlarmSchedulerImpl(this)
 //                                        alarmSchedulerImpl.schedule(it)
 //                                        Log.d(
 //                                            "temp",

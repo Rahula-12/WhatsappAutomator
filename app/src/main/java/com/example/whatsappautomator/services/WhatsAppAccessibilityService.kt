@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import com.example.whatsappautomator.scheduling.AlarmSchedulerImpl
 import com.example.whatsappautomator.scheduling.SendMessageWorker
 
 class WhatsAppAccessibilityService : AccessibilityService() {
@@ -51,7 +52,7 @@ class WhatsAppAccessibilityService : AccessibilityService() {
             Log.e("WhatsAppAccessibilityService", "InterruptedException: ${e.message}")
         }
         performGlobalAction(GLOBAL_ACTION_BACK)
-        SendMessageWorker.serviceStarted = false
+        SendMessageWorker.serviceStarted=false
     }
 
     override fun onInterrupt() {

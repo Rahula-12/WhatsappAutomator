@@ -35,20 +35,20 @@ class AlarmSchedulerImpl(
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
         val selectedTimeMillis = calendar.timeInMillis
-       // val packageManager=context.packageManager
-        val url="https://api.whatsapp.com/send?phone=+${autoMessage.countryCode}${autoMessage.to}&text=${URLEncoder.encode(autoMessage.message,"UTF-8")}"
-        val whatsAppIntent= Intent(Intent.ACTION_VIEW)
-        whatsAppIntent.setPackage("com.whatsapp")
-        whatsAppIntent.data = Uri.parse(url)
-        whatsAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        alarmManager.setInexactRepeating(
-            AlarmManager.RTC_WAKEUP,
+       val receiverIntent=Intent(context,ScheduleReceiver::class.java)
+        receiverIntent.action="Schedule"
+        receiverIntent.putExtra("countryCode",autoMessage.countryCode)
+        receiverIntent.putExtra("phoneNumber",autoMessage.to)
+        receiverIntent.putExtra("message",autoMessage.message)
+        receiverIntent.putExtra("hashCode",autoMessage.hashCode())
+        alarmManager.setRepeating(
+            AlarmManager.RTC,
             selectedTimeMillis,
-            10000L,
-            PendingIntent.getActivity(
+            3600000L*24,
+            PendingIntent.getBroadcast(
                 context,
                 autoMessage.hashCode(),
-                whatsAppIntent,
+                receiverIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         )
@@ -62,7 +62,7 @@ class AlarmSchedulerImpl(
         whatsAppIntent.data = Uri.parse(url)
         whatsAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         alarmManager.cancel(
-            PendingIntent.getActivity(
+            PendingIntent.getBroadcast(
                 context,
                 autoMessage.hashCode(),
                 whatsAppIntent,
