@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.whatsappautomator.model.AutoMessage
 import com.example.whatsappautomator.repository.AutoMessageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,10 @@ class AutoMessageViewModel @Inject constructor(private val autoMessageRepository
         viewModelScope.launch {
             autoMessageRepository.deleteAutoMessage(autoMessage)
         }
+    }
+
+    fun updateAutoMessage(autoMessage:AutoMessage)=viewModelScope.launch(Dispatchers.IO){
+        autoMessageRepository.updateAutoMessage(autoMessage)
     }
 
 

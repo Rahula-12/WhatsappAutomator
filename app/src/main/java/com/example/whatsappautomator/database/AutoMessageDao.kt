@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.whatsappautomator.model.AutoMessage
 import kotlinx.coroutines.flow.Flow
 
@@ -22,4 +23,6 @@ interface AutoMessageDao {
     @Query("Delete from AutoMessage where s_no=:id")
     suspend fun deleteMessageBasedOnId(id:String)
 
+    @Update
+    suspend fun updateAutoMessage(autoMessage:AutoMessage)
 }

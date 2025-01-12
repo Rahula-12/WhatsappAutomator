@@ -53,6 +53,7 @@ class WhatsAppAccessibilityService : AccessibilityService() {
         }
         performGlobalAction(GLOBAL_ACTION_BACK)
         SendMessageWorker.serviceStarted=false
+//        AlarmSchedulerImpl.isFree=true
     }
 
     override fun onInterrupt() {

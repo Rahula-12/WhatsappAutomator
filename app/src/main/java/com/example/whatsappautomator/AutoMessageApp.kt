@@ -2,7 +2,6 @@ package com.example.whatsappautomator
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,7 +50,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -61,12 +59,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.whatsappautomator.model.AutoMessage
 import com.example.whatsappautomator.ui.theme.DarkGreen
 import com.example.whatsappautomator.ui.theme.LightGreen
@@ -80,18 +76,16 @@ fun AutoMessageApp(
     modifier: Modifier = Modifier,
     autoMessages: List<AutoMessage> = listOf(
         AutoMessage(
-            message = "Hi",
-            to = "7307140364",
-            time = "hh:mm",
-            countryCode = "91"
+            message = "",
+            to = "",
+            time = "",
+            countryCode = ""
         )
     ),
     addMessage: (AutoMessage) -> Boolean = { false },
+    updateAutoMessage:(AutoMessage)->Boolean={false},
     deleteAutoMessage: (AutoMessage) -> Unit = {}
 ) {
-    val showDialog = remember {
-        mutableStateOf(false)
-    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -119,14 +113,12 @@ fun AutoMessageApp(
                 items(autoMessages) {
                     AutoMessageItem(
                         autoMessage = it,
-                        deleteAutoMessage = deleteAutoMessage
+                        deleteAutoMessage = deleteAutoMessage,
+                        updateAutoMessage = updateAutoMessage
                     )
                 }
             }
-            AddAutoMessage(modifier, showDialog)
-            AnimatedVisibility(visible = showDialog.value) {
-                AutoMessageDialog(showDialog, modifier, addMessage)
-            }
+            AddAutoMessage(modifier,addMessage)
         }
     }
 }
@@ -136,10 +128,20 @@ fun AutoMessageApp(
 fun AutoMessageItem(
     modifier: Modifier = Modifier,
     autoMessage: AutoMessage = AutoMessage(message = "Hi", time = "hh:mm", to = "7307140364"),
-    deleteAutoMessage: (AutoMessage) -> Unit = {}
+    deleteAutoMessage: (AutoMessage) -> Unit = {},
+    updateAutoMessage:(AutoMessage)->Boolean={false}
 ) {
+    val showUpdateDialog= remember {
+        mutableStateOf(false)
+    }
+    if(showUpdateDialog.value) {
+        AutoMessageDialog(showUpdateDialog, modifier, updateAutoMessage, isUpdating = true, autoMessage)
+    }
     Row(
         modifier = modifier
+            .clickable {
+                showUpdateDialog.value = true
+            }
             .fillMaxWidth()
             .padding(10.dp),
         horizontalArrangement = Arrangement.Start
@@ -218,8 +220,19 @@ fun AutoMessageItem(
 @Composable
 private fun AddAutoMessage(
     modifier: Modifier,
-    showDialog: MutableState<Boolean>
+    addMessage: (AutoMessage) -> Boolean
 ) {
+    val showDialog= remember {
+        mutableStateOf(false)
+    }
+    if(showDialog.value) {
+        AutoMessageDialog(showDialog, modifier, addMessage, isUpdating = false, AutoMessage(
+            message = "",
+            to = "",
+            time = "",
+            countryCode = ""
+        ))
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -245,22 +258,24 @@ private fun AddAutoMessage(
     }
 }
 
-@Preview
+//@Preview
 @Composable
 private fun AutoMessageDialog(
     showDialog: MutableState<Boolean> = mutableStateOf(false),
     modifier: Modifier = Modifier,
-    addMessage: (AutoMessage) -> Boolean = { false }
+    operation: (AutoMessage) -> Boolean = { false },
+    isUpdating: Boolean,
+    autoMessage: AutoMessage
 ) {
     Dialog(onDismissRequest = { showDialog.value = false }) {
         val message = remember {
-            mutableStateOf("")
+            mutableStateOf(autoMessage.message)
         }
         val phoneNumber = remember {
-            mutableStateOf("")
+            mutableStateOf(autoMessage.to)
         }
         val countryCode = remember {
-            mutableStateOf("")
+            mutableStateOf(autoMessage.countryCode)
         }
         val time = LocalDateTime.now().plusMinutes(1L)
         val timePickerState = remember {
@@ -302,13 +317,15 @@ private fun AutoMessageDialog(
             //StartAndEndDate(modifier, datePickerDialog1,datePickerDialog2,forever,startDate,endDate)
            // ForeverSchedule(modifier,forever)
             DecisionButtons(
+                isUpdating,
                 modifier,
-                addMessage,
+                operation,
                 message,
                 phoneNumber,
                 countryCode,
                 timePickerState,
-                showDialog
+                showDialog,
+                autoMessage
             )
         }
     }
@@ -470,13 +487,15 @@ private fun PhoneNumberWithCode(
 
 @Composable
 private fun DecisionButtons(
+    isUpdating:Boolean=false,
     modifier: Modifier,
-    addMessage: (AutoMessage) -> Boolean,
+    operation: (AutoMessage) -> Boolean,
     message: MutableState<String>,
     phoneNumber: MutableState<String>,
     countryCode: MutableState<String>,
     timePickerState: TimePickerState,
-    showDialog: MutableState<Boolean>
+    showDialog: MutableState<Boolean>,
+    autoMessage: AutoMessage
 ) {
     Row(
         modifier = modifier.padding(
@@ -497,8 +516,9 @@ private fun DecisionButtons(
                 contentColor = Color.White
             ),
             onClick = {
-                if (addMessage(
+                if (operation(
                         AutoMessage(
+                            messageNo = autoMessage.messageNo,
                             message = message.value,
                             to = phoneNumber.value,
                             countryCode = countryCode.value,
@@ -519,7 +539,9 @@ private fun DecisionButtons(
                     showDialog.value = false
             }
         ) {
-            Text("Add Message")
+            if(!isUpdating)
+            Text("Add Message",textAlign=TextAlign.Center)
+            else Text("Update Message",textAlign=TextAlign.Center)
         }
         Button(
             onClick = { showDialog.value = false },

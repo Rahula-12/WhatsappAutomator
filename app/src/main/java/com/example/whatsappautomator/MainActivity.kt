@@ -127,10 +127,57 @@ class MainActivity : ComponentActivity() {
                                 return@AutoMessageApp false
                             },
                             deleteAutoMessage = {
-                                workManager.cancelAllWorkByTag(it.messageNo+" "+it.to+" "+it.message+" "+it.time)
+                                workManager.cancelAllWorkByTag(it.messageNo)
 //                                val alarmSchedulerImpl=AlarmSchedulerImpl(this)
 //                                alarmSchedulerImpl.cancel(it)
                                 viewModel.deleteMessage(it)
+                            },
+                            updateAutoMessage = {
+                                if (it.message.isEmpty()) {
+                                    Toast.makeText(this, "Please enter message", Toast.LENGTH_LONG)
+                                        .show()
+                                } else if (it.to.isNullOrEmpty()) {
+                                    Toast.makeText(
+                                        this,
+                                        "Please enter phone number",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else if (it.countryCode.isNullOrEmpty()) {
+                                    Toast.makeText(
+                                        this,
+                                        "Please enter country code",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    val rawNumber = Phonenumber.PhoneNumber()
+                                    rawNumber.countryCode = it.countryCode.toIntOrNull() ?: 91
+                                    rawNumber.nationalNumber = it.to.toLong()
+                                    if (phoneNumberUtil.isValidNumber(rawNumber)) {
+                                        workManager.cancelAllWorkByTag(it.messageNo)
+                                        val workRequest: PeriodicWorkRequest =
+                                            periodicWorkRequest(it)
+                                        workManager
+                                            .enqueueUniquePeriodicWork(
+                                                it.messageNo,
+                                                ExistingPeriodicWorkPolicy.REPLACE,
+                                                workRequest
+                                            )
+//                                        val alarmSchedulerImpl= AlarmSchedulerImpl(this)
+//                                        alarmSchedulerImpl.schedule(it)
+//                                        Log.d(
+//                                            "temp",
+//                                            workManager.getWorkInfosByTag(it.messageNo).toString()
+//                                        )
+                                        viewModel.updateAutoMessage(it)
+                                        return@AutoMessageApp true
+                                    } else
+                                        Toast.makeText(
+                                            this,
+                                            "Please enter correct phone number",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                }
+                                return@AutoMessageApp false
                             }
                         )
                     }
@@ -156,7 +203,7 @@ class MainActivity : ComponentActivity() {
         return PeriodicWorkRequestBuilder<SendMessageWorker>(1, TimeUnit.DAYS)
             .setInputData(data)
             .setInitialDelay(calculateInitialDelay(hour, minute), TimeUnit.MILLISECONDS)
-            .addTag(it.messageNo+" "+it.to+" "+it.message+" "+it.time)
+            .addTag(it.messageNo)
             .setBackoffCriteria(BackoffPolicy.LINEAR,100L,TimeUnit.MILLISECONDS)
             .build()
     }
