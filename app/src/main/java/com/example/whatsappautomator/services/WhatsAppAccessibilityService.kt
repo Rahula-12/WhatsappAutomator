@@ -8,6 +8,11 @@ import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import com.example.whatsappautomator.scheduling.AlarmSchedulerImpl
 import com.example.whatsappautomator.scheduling.SendMessageWorker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class WhatsAppAccessibilityService : AccessibilityService() {
 
@@ -44,15 +49,20 @@ class WhatsAppAccessibilityService : AccessibilityService() {
 
         Log.d("WhatsAppAccessibilityService", "Clicking send button")
         sendButton.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-        try {
-            Thread.sleep(3600)
+        val coroutineScope= CoroutineScope(Dispatchers.Main)
+        coroutineScope.launch {
+            try {
+               delay(2000)
+                performGlobalAction(GLOBAL_ACTION_BACK)
+                delay(2000)
+            } catch (e: InterruptedException) {
+                Log.e("WhatsAppAccessibilityService", "InterruptedException: ${e.message}")
+            }
             performGlobalAction(GLOBAL_ACTION_BACK)
-            Thread.sleep(2000)
-        } catch (e: InterruptedException) {
-            Log.e("WhatsAppAccessibilityService", "InterruptedException: ${e.message}")
+            SendMessageWorker.serviceStarted=false
+            cancel()
         }
-        performGlobalAction(GLOBAL_ACTION_BACK)
-        SendMessageWorker.serviceStarted=false
+
 //        AlarmSchedulerImpl.isFree=true
     }
 

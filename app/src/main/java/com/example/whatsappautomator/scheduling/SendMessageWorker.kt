@@ -9,9 +9,11 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -78,10 +80,10 @@ class SendMessageWorker(
                         if(currTimeInMillis-selectedTimeMillis>15*60000L) {
                             val workManager=WorkManager.getInstance(applicationContext)
                             //autoMessageRepository.deleteMessageBasedOnId(id!!)
-                            workManager.cancelAllWorkByTag("$id $phoneNumber $message $time")
+                            workManager.cancelAllWorkByTag(id!!)
                             workManager
                                 .enqueueUniquePeriodicWork(
-                                    id!!,
+                                    id,
                                     ExistingPeriodicWorkPolicy.UPDATE,
                                     periodicWorkRequest(AutoMessage(id, message,phoneNumber,time,countryCode))
                                 )
@@ -106,18 +108,20 @@ class SendMessageWorker(
     private fun periodicWorkRequest(it: AutoMessage): PeriodicWorkRequest {
         val hour: Int = it.time.substring(0, 2).toInt()
         val minute: Int = it.time.substring(3).toInt()
-        val data: Data = Data.Builder()
+        val data:Data=Data.Builder()
             .putString("phoneNumber",it.to)
             .putString("message",it.message)
             .putString("id",it.messageNo)
             .putString("time",it.time)
             .putString("countryCode",it.countryCode)
             .build()
+        val constraints= Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
         return PeriodicWorkRequestBuilder<SendMessageWorker>(1, TimeUnit.DAYS)
+            .setConstraints(constraints)
             .setInputData(data)
             .setInitialDelay(calculateInitialDelay(hour, minute), TimeUnit.MILLISECONDS)
-            .addTag(it.messageNo+" "+it.to+" "+it.message+" "+it.time)
-            .setBackoffCriteria(BackoffPolicy.LINEAR,100L, TimeUnit.MILLISECONDS)
+            .addTag(it.messageNo)
+            .setBackoffCriteria(BackoffPolicy.LINEAR,100L,TimeUnit.MILLISECONDS)
             .build()
     }
 

@@ -24,8 +24,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -200,7 +202,9 @@ class MainActivity : ComponentActivity() {
             .putString("time",it.time)
             .putString("countryCode",it.countryCode)
                         .build()
+        val constraints=Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
         return PeriodicWorkRequestBuilder<SendMessageWorker>(1, TimeUnit.DAYS)
+            .setConstraints(constraints)
             .setInputData(data)
             .setInitialDelay(calculateInitialDelay(hour, minute), TimeUnit.MILLISECONDS)
             .addTag(it.messageNo)
